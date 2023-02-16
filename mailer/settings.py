@@ -6,6 +6,10 @@ from environs import Env
 env = Env()
 env.read_env()
 
+BROKER_URL = env.str('REDIS_URL')
+# ACCEPT_CONTENT = ['json']
+# TASK_SERIALIZER = 'json'
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -103,3 +107,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
