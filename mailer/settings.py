@@ -7,8 +7,6 @@ env = Env()
 env.read_env()
 
 BROKER_URL = env.str('REDIS_URL')
-# ACCEPT_CONTENT = ['json']
-# TASK_SERIALIZER = 'json'
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -118,3 +116,5 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
+
+TRACKING_ID = env('TRACKING_ID')

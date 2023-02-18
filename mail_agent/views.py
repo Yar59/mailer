@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 import pytz
+from django.conf import settings
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.html import strip_tags
@@ -22,6 +23,7 @@ def index(request):
 def create_mailing_list(request):
     if request.method == 'POST':
         data = request.POST
+        print data
         mailing_time = datetime.strptime(str((data.get('mailing-time'))), '%Y-%m-%dT%H:%M')
         local_mailing_time = pytz.timezone('UTC').localize(mailing_time, is_dst=None)
         auth_user = data.get('auth_user')
@@ -36,9 +38,20 @@ def create_mailing_list(request):
                 status=400
             )
         email_from = auth_user
+        print email_from
         subscribers = Subscriber.objects.all()
         for subscriber in subscribers:
-            html_message = render_to_string('../templates/message_template.html', {'context': 'values'})
+            tracking_link_template = 'http://www.google-analytics.com/' \
+                                     'collect?v=1&tid={tracking_id}&t=event&cid={recipient_id}&ec=kinetic&ea=open'
+            tracking_link = tracking_link_template.format(tracking_id=settings.TRACKING_ID, recipient_id=subscriber.id)
+            html_message = render_to_string(
+                '../templates/message_template.html',
+                {
+                    'name': subscriber.name,
+                    'birthday': subscriber.birthday,
+                    'tracking_link': tracking_link,
+                }
+            )
             plain_message = strip_tags(html_message)
             send_email_task.apply_async(
                 (
