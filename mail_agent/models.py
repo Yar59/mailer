@@ -16,7 +16,6 @@ class Subscriber(models.Model):
     birthday = models.DateField(
         'день рождения',
         max_length=50,
-        blank=True,
     )
 
     class Meta:
