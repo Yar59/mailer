@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 
 
 @shared_task(bind=True, default_retry_delay=10 * 60)
-def send_email_task(self, subject, message, email_from, recipient_list, html_message=None):
+def send_email_task(self, subject, message, email_from, recipient_list, html_message=None, auth_user=None, auth_password=None):
     try:
         send_mail(subject, message, email_from, recipient_list, html_message=html_message)
     except smtplib.SMTPException as ex:

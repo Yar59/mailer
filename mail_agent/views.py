@@ -20,10 +20,13 @@ def index(request):
 
 
 def create_mailing_list(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         data = request.POST
-        mailing_time = datetime.strptime(str((data.get("mailing-time"))), "%Y-%m-%dT%H:%M")
-        local_mailing_time = pytz.timezone("UTC").localize(mailing_time, is_dst=None)
+        mailing_time = datetime.strptime(str((data.get('mailing-time'))), '%Y-%m-%dT%H:%M')
+        local_mailing_time = pytz.timezone('UTC').localize(mailing_time, is_dst=None)
+        auth_user = data.get('auth_user')
+        auth_password = data.get('auth_password')
+        subject = data.get('subject')
         if timezone.localtime(local_mailing_time) < timezone.localtime(timezone.now()):
             return JsonResponse(
                 data={
@@ -32,18 +35,20 @@ def create_mailing_list(request):
                 },
                 status=400
             )
-        email_from = 'dyadkayar59@yandex.ru'
+        email_from = auth_user
         subscribers = Subscriber.objects.all()
         for subscriber in subscribers:
             html_message = render_to_string('../templates/message_template.html', {'context': 'values'})
             plain_message = strip_tags(html_message)
             send_email_task.apply_async(
                 (
-                'subject',
-                plain_message,
-                email_from,
-                [subscriber.email, ],
-                html_message,
+                    subject,
+                    plain_message,
+                    email_from,
+                    [subscriber.email, ],
+                    html_message,
+                    auth_user,
+                    auth_password,
                 ),
                 eta=local_mailing_time
             )
