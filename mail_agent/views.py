@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from django.utils import timezone
 
 from models import Subscriber
 from .tasks import send_email_task
@@ -18,17 +17,28 @@ def index(request):
 def create_mailing_list(request):
     if request.method == "POST":
         data = request.POST
-        datetime_mailing_time = datetime.strptime(str((data.get("mailing-time"))), "%Y-%m-%dT%H:%M")
-        if datetime_mailing_time < datetime.now():
+        mailing_time = datetime.strptime(str((data.get("mailing-time"))), "%Y-%m-%dT%H:%M")
+        if mailing_time < datetime.now():
             return JsonResponse(
-                data={'error': "Время рассылки должно быть больше текущего."},
+                data={
+                    'status': 400,
+                    'error': 'Время рассылки должно быть больше текущего.'
+                },
                 status=400
             )
         #TODO обработка рассылки
-        return JsonResponse(data={}, status=201)
+        return JsonResponse(
+            data={
+                'status': 201
+            },
+            status=201
+        )
     else:
         return JsonResponse(
-            data={},
+            data={
+                'status': 404,
+                'error': 'Только POST запросы'
+            },
             status=404
         )
     # email_from = 'dyadkayar59@yandex.ru'
@@ -42,4 +52,3 @@ def create_mailing_list(request):
     #         [subscriber.email, ],
     #     ))
     # send_email_task.delay(tuple(mails))
-    return HttpResponse('success')

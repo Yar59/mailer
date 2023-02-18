@@ -26,11 +26,13 @@ $(function ($) {
             dataType: 'json',
             success: function (response) {
                 console.log('ok - ', response)
-                window.location.reload()
+                if (response.status === 201){
+                    window.location.reload()
+                }
             },
             error: function (response) {
                 console.log('err - ', response)
-                if (response.status == 400){
+                if (response.status === 400){
                   $('.alert-danger').removeClass('d-none')
                 }
             }
