@@ -23,7 +23,7 @@ def index(request):
 def create_mailing_list(request):
     if request.method == 'POST':
         data = request.POST
-        print data
+
         mailing_time = datetime.strptime(str((data.get('mailing-time'))), '%Y-%m-%dT%H:%M')
         local_mailing_time = pytz.timezone('UTC').localize(mailing_time, is_dst=None)
         auth_user = data.get('auth_user')
@@ -38,7 +38,7 @@ def create_mailing_list(request):
                 status=400
             )
         email_from = auth_user
-        print email_from
+
         subscribers = Subscriber.objects.all()
         for subscriber in subscribers:
             tracking_link_template = 'http://www.google-analytics.com/' \
